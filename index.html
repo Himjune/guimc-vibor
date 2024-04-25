@@ -45,7 +45,7 @@
     <div id="Stages">
 
     </div>
-
+    <button type="button" class="btn btn-primary" onclick="reset()">Сброс</button>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
@@ -79,7 +79,12 @@
         const BUTTON_TEMPLATE = `
         <button id="btn-{variant-stage}" type="button" class="btn" data-stage="{variant-stage}" data-vtext="{variant-text}" onclick="clicka(this)">{variant-text}</button>
     `
-
+        function reset() {
+            stages.forEach((stage, sIdx) => {
+                localStorage.removeItem(sIdx);
+            });
+            update();
+        }
         function clicka(btn) {
             localStorage.setItem(btn.dataset['stage'], btn.dataset['vtext']);
             update();
