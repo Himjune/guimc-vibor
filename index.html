@@ -25,12 +25,15 @@
         .stage-correct {
             color: green;
         }
+
         .stage-wrong {
             color: red;
         }
+
         .stage-correct .btn {
             background-color: green !important;
         }
+
         .stage-wrong .btn {
             background-color: red !important;
         }
@@ -83,14 +86,14 @@
             stages.forEach((stage, sIdx) => {
                 localStorage.removeItem(sIdx);
             });
-            update();
+            render();
         }
 
         function clicka(btn) {
-           /*if (localStorage.getItem(btn.dataset['stage']) return;*/
+            if (localStorage.getItem(btn.dataset['stage'])) return;
 
- localStorage.setItem(btn.dataset['stage'], btn.dataset['vtext']);
-            update();
+            localStorage.setItem(btn.dataset['stage'], btn.dataset['vtext']);
+            render();
         }
         function update() {
 
@@ -112,22 +115,30 @@
             });
         }
 
-        let html = ""
-        stages.forEach((stage, sIdx) => {
-//if (sIdx>0 && !localStorage.getItem(sIdx-1)) break;
+        function render() {
 
-            let vhtml = ""
-            stage.variants.forEach(variant => {
-                vhtml += BUTTON_TEMPLATE.replace(/{variant-stage}/gm, sIdx).replace(/{variant-text}/gm, variant)
-            });
+            let html = ""
+            for (let index = 0; index < stages.length; index++) {
+                const stage = stages[index];
 
-            html += STAGE_TEMPLATE.replace(/{stage}/gm, sIdx).replace(/{stage-text}/gm, sIdx + 1).replace(/{variants}/gm, vhtml);
-        });
+                if (index > 0 && !localStorage.getItem(index - 1)) break;
 
-        console.log(html);
-        document.getElementById("Stages").innerHTML = html;
-        
-        update();
+                let vhtml = ""
+                stage.variants.forEach(variant => {
+                    vhtml += BUTTON_TEMPLATE.replace(/{variant-stage}/gm, index).replace(/{variant-text}/gm, variant)
+                });
+
+                html += STAGE_TEMPLATE.replace(/{stage}/gm, index).replace(/{stage-text}/gm, index + 1).replace(/{variants}/gm, vhtml);
+            };
+
+            console.log(html);
+            document.getElementById("Stages").innerHTML = html;
+
+            update();
+
+        }
+
+        render();
     </script>
 </body>
 
