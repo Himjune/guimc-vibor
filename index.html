@@ -112,7 +112,7 @@
 
         let html = ""
         stages.forEach((stage, sIdx) => {
-if (sOdx>0 && !localStorage.getItem(sIdx-1)) break;
+if (sIdx>0 && !localStorage.getItem(sIdx-1)) break;
 
             let vhtml = ""
             stage.variants.forEach(variant => {
