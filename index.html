@@ -86,7 +86,8 @@
             update();
         }
         function clicka(btn) {
-            localStorage.setItem(btn.dataset['stage'], btn.dataset['vtext']);
+           if (localStorage.getItem(btn.dataset['stage']) return;
+ localStorage.setItem(btn.dataset['stage'], btn.dataset['vtext']);
             update();
         }
         function update() {
