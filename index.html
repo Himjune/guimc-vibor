@@ -47,11 +47,18 @@
 </head>
 
 <body>
+    <h1>Слухоречевой тренинг</h1>
     <div id="StagesHeader">
     </div>
-    <div id="Stages">
+    <h3>Термины без шума</h3>
+    <div id="StagesNoNoise">
 
     </div>
+    <h3>Термины в шуме</h3>
+    <div id="StagesWiNoise">
+
+    </div>
+
     <button type="button" class="btn btn-primary" onclick="reset()">Сброс</button>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
@@ -59,8 +66,8 @@
         crossorigin="anonymous"></script>
     <script>
         function getRandomZeroOne() {
-  return Math.floor(Math.random() + 0.5); // The maximum is exclusive and the minimum is inclusive
-}
+            return Math.floor(Math.random() + 0.5); // The maximum is exclusive and the minimum is inclusive
+        }
 
 
 
@@ -81,8 +88,25 @@
 15.	Программное средство - Программная среда
 16.	Релевантная информация - Нерелевантная информация`
 
-        var stages = [
-        ]
+        const lWiNoise = `1.	Программная среда - Программное средство
+2.	Рекомендательная система - Наблюдательная система
+3.	Достаточная информация - Избыточная информация
+4.	Нерелевантная информация - Релевантная информация
+5.	Наблюдательная система - Рекомендательная система
+6.	Избыточная информация - Достаточная информация
+7.	Программное средство - Программная среда
+8.	Релевантная информация - Нерелевантная информация
+9.	Рекомендательная система - Наблюдательная система
+10.	Программная среда - Программное средство
+11.	Нерелевантная информация - Релевантная информация
+12.	Достаточная информация - Избыточная информация
+13.	Программное средство - Программная среда
+14.	Наблюдательная система - Рекомендательная система
+15.	Избыточная информация - Достаточная информация
+16.	Релевантная информация - Нерелевантная информация`
+
+        const stagesNoNoise = []
+        const stagesWiNoise = []
 
         function check(variant, stage) {
             return variant === stage.correct;
@@ -90,7 +114,7 @@
 
         const STAGE_TEMPLATE = `
         <div id="sc-{stage}" class="stage-card">
-            <h3>{stage-text}</h3>
+            <h5>{stage-text}</h5>
             <div class="stage-variants">
                 {variants}
             </div>
@@ -100,8 +124,11 @@
         <button id="btn-{variant-stage}" type="button" class="btn {variant-classes}" data-stage="{variant-stage}" data-vtext="{variant-text}" onclick="clicka(this)">{variant-text}</button>
     `
         function reset() {
-            stages.forEach((stage, sIdx) => {
-                localStorage.removeItem(sIdx);
+            stagesNoNoise.forEach((stage, sIdx) => {
+                localStorage.removeItem("n"+sIdx);
+            });
+            stagesWiNoise.forEach((stage, sIdx) => {
+                localStorage.removeItem("w"+sIdx);
             });
             render();
         }
@@ -112,11 +139,15 @@
             localStorage.setItem(btn.dataset['stage'], btn.dataset['vtext']);
             render();
         }
-        function update() {
 
+function update() {
+    _update(stagesNoNoise)
+    _update(stagesWiNoise)
+}
+        function _update(stages) {
             stages.forEach((stage, sIdx) => {
-                let loc = localStorage.getItem(sIdx);
-                const sc = document.getElementById('sc-' + sIdx)
+                let loc = localStorage.getItem(stage.type+sIdx);
+                const sc = document.getElementById('sc-' + stage.type+sIdx)
                 if (loc) {
                     if (loc == stage.correct) {
                         sc.classList.toggle('stage-correct', true);
@@ -132,46 +163,63 @@
             });
         }
 
-        function render() {
-
+        function _render(stages, element) {
             let html = ""
             for (let index = 0; index < stages.length; index++) {
                 const stage = stages[index];
 
-                if (index > 0 && !localStorage.getItem(index - 1)) break;
+                if (index > 0 && !localStorage.getItem(stage.type + (index-1))) break;
 
                 let vhtml = ""
                 stage.variants.forEach(variant => {
                     let classes = ""
-                    if (localStorage.getItem(index) == variant) classes += "btn-secondary "
+                    if (localStorage.getItem(stage.type+index) == variant) classes += "btn-secondary "
                     else classes += "btn-light "
-                    if (localStorage.getItem(index))
+                    if (localStorage.getItem(stage.type+index))
                         if (check(variant, stage)) classes += "variant-correct ";
                         else classes += "variant-wrong ";
 
-                    console.log(localStorage.getItem(index), variant, localStorage.getItem(index) == variant, classes)
-                    vhtml += BUTTON_TEMPLATE.replace(/{variant-classes}/gm, classes).replace(/{variant-stage}/gm, index).replace(/{variant-text}/gm, variant)
+                    vhtml += BUTTON_TEMPLATE.replace(/{variant-classes}/gm, classes).replace(/{variant-stage}/gm, stage.type+index).replace(/{variant-text}/gm, variant)
                 });
-
-                html += STAGE_TEMPLATE.replace(/{stage}/gm, index).replace(/{stage-text}/gm, index + 1).replace(/{variants}/gm, vhtml);
+                html += STAGE_TEMPLATE.replace(/{stage}/gm, stage.type+index).replace(/{stage-text}/gm, "Термин "+(index+1)).replace(/{variants}/gm, vhtml);
             };
-            
-            document.getElementById("Stages").innerHTML = html;
 
-            update();
-
+            element.innerHTML = html;
         }
 
-        let lines = lNoNoise.split('\n');
-        lines.forEach(ln => {
-            ln = ln.split('\t')[1].split(' - ');
-            let rnd = getRandomZeroOne();
-            let nrnd = Math.abs(rnd-1);
-            stages.push({
-                variants: [ln[rnd], ln[nrnd]],
-                correct: ln[0]
-            })
-        });
+        function linesSplit(lines, stages, type) {
+            let prevRnd = 0;
+            let prevCnt = 0;
+            lines = lines.split('\n');
+            lines.forEach(ln => {
+                ln = ln.split('\t')[1].split(' - ');
+                let rnd = getRandomZeroOne();
+                if (prevRnd == rnd) prevCnt++;
+                if (prevCnt > 1) {
+                    prevCnt = 0;
+                    rnd = Math.abs(rnd - 1);
+                }
+
+                let nrnd = Math.abs(rnd - 1);
+                stages.push({
+                    variants: [ln[rnd], ln[nrnd]],
+                    correct: ln[0],
+                    type: type
+                });
+                
+                prevRnd = rnd;
+            });
+        }
+
+        function render() {
+            _render(stagesNoNoise, document.getElementById("StagesNoNoise"))
+            _render(stagesWiNoise, document.getElementById("StagesWiNoise"))
+
+            update();
+        }
+
+        linesSplit(lNoNoise, stagesNoNoise, "n");
+        linesSplit(lWiNoise, stagesWiNoise, "w");
         render();
 
 
