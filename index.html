@@ -68,6 +68,11 @@
         function getRandomZeroOne() {
             return Math.floor(Math.random() + 0.5); // The maximum is exclusive and the minimum is inclusive
         }
+        function getRandomInt(min, max) {
+            const minCeiled = Math.ceil(min);
+            const maxFloored = Math.floor(max);
+            return Math.floor(Math.random() * (maxFloored - minCeiled) + minCeiled); // The maximum is exclusive and the minimum is inclusive
+        }
 
 
 
@@ -125,10 +130,10 @@
     `
         function reset() {
             stagesNoNoise.forEach((stage, sIdx) => {
-                localStorage.removeItem("n"+sIdx);
+                localStorage.removeItem("n" + sIdx);
             });
             stagesWiNoise.forEach((stage, sIdx) => {
-                localStorage.removeItem("w"+sIdx);
+                localStorage.removeItem("w" + sIdx);
             });
             render();
         }
@@ -140,14 +145,14 @@
             render();
         }
 
-function update() {
-    _update(stagesNoNoise)
-    _update(stagesWiNoise)
-}
+        function update() {
+            _update(stagesNoNoise)
+            _update(stagesWiNoise)
+        }
         function _update(stages) {
             stages.forEach((stage, sIdx) => {
-                let loc = localStorage.getItem(stage.type+sIdx);
-                const sc = document.getElementById('sc-' + stage.type+sIdx)
+                let loc = localStorage.getItem(stage.type + sIdx);
+                const sc = document.getElementById('sc-' + stage.type + sIdx)
                 if (loc) {
                     if (loc == stage.correct) {
                         sc.classList.toggle('stage-correct', true);
@@ -168,20 +173,20 @@ function update() {
             for (let index = 0; index < stages.length; index++) {
                 const stage = stages[index];
 
-                if (index > 0 && !localStorage.getItem(stage.type + (index-1))) break;
+                if (index > 0 && !localStorage.getItem(stage.type + (index - 1))) break;
 
                 let vhtml = ""
                 stage.variants.forEach(variant => {
                     let classes = ""
-                    if (localStorage.getItem(stage.type+index) == variant) classes += "btn-secondary "
+                    if (localStorage.getItem(stage.type + index) == variant) classes += "btn-secondary "
                     else classes += "btn-light "
-                    if (localStorage.getItem(stage.type+index))
+                    if (localStorage.getItem(stage.type + index))
                         if (check(variant, stage)) classes += "variant-correct ";
                         else classes += "variant-wrong ";
 
-                    vhtml += BUTTON_TEMPLATE.replace(/{variant-classes}/gm, classes).replace(/{variant-stage}/gm, stage.type+index).replace(/{variant-text}/gm, variant)
+                    vhtml += BUTTON_TEMPLATE.replace(/{variant-classes}/gm, classes).replace(/{variant-stage}/gm, stage.type + index).replace(/{variant-text}/gm, variant)
                 });
-                html += STAGE_TEMPLATE.replace(/{stage}/gm, stage.type+index).replace(/{stage-text}/gm, "Термин "+(index+1)).replace(/{variants}/gm, vhtml);
+                html += STAGE_TEMPLATE.replace(/{stage}/gm, stage.type + index).replace(/{stage-text}/gm, "Термин " + (index + 1)).replace(/{variants}/gm, vhtml);
             };
 
             element.innerHTML = html;
@@ -193,9 +198,9 @@ function update() {
             lines = lines.split('\n');
             lines.forEach(ln => {
                 ln = ln.split('\t')[1].split(' - ');
-                let rnd = getRandomZeroOne();
+                let rnd = getRandomInt(1, 20) <= 10 ? 0 : 1; // D20
                 if (prevRnd == rnd) prevCnt++;
-                if (prevCnt > 1) {
+                if (prevCnt > 3) {
                     prevCnt = 0;
                     rnd = Math.abs(rnd - 1);
                 }
@@ -206,7 +211,7 @@ function update() {
                     correct: ln[0],
                     type: type
                 });
-                
+
                 prevRnd = rnd;
             });
         }
