@@ -26,10 +26,12 @@
             margin: 0 auto;
             width: 80%;
         }
+
         .noise-block {
             margin-top: 3rem;
             margin-bottom: 6rem;
         }
+
         .noise-title {
             margin: 2rem;
         }
@@ -37,6 +39,7 @@
         .stage-actual .card-header {
             background-color: bisque;
         }
+
         .stage-correct .card-header {
             background-color: lightgreen;
         }
@@ -87,7 +90,7 @@
             </div>
         </div>
     </div>
-    <button type="button" class="btn btn-primary" onclick="reset()">Сброс</button>
+    <button type="button" class="btn btn-primary" onclick="saver()">Сохранить</button>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
@@ -166,6 +169,31 @@
             {variant-text}
         </button>`
 
+        function _saver(stages) {
+            let res = ""
+            stages.forEach((stage,sIdx) => {
+                const loc = localStorage.getItem(stage.type + sIdx);
+                if (loc) {
+                    res += check(loc, stage) ? "1," : "0,";
+                } else res += ".,"
+            });
+
+            return res;
+        }
+
+        function saver() {
+
+            const r1 = _saver(stagesNoNoise);
+            const r2 = _saver(stagesWiNoise);
+
+            const link = document.createElement("a");
+            const file = new Blob([r1+"\n"+r2], { type: 'text/plain' });
+            link.href = URL.createObjectURL(file);
+            link.download = "УПСП_ТРЕНИНГ_.txt";
+            link.click();
+            URL.revokeObjectURL(link.href);
+        }
+
         function reset() {
             stagesNoNoise.forEach((stage, sIdx) => {
                 localStorage.removeItem("n" + sIdx);
@@ -200,7 +228,7 @@
                         sc.classList.toggle('stage-wrong', true);
                     }
                 } else {
-                    if (sIdx == 0 || localStorage.getItem(stage.type + (sIdx-1))) {
+                    if (sIdx == 0 || localStorage.getItem(stage.type + (sIdx - 1))) {
                         sc.classList.toggle('stage-actual', true);
                     } else {
                         sc.classList.toggle('stage-actual', false);
@@ -233,7 +261,7 @@
                 html += STAGE_TEMPLATE.replace(/{stage}/gm, stage.type + index).replace(/{stage-text}/gm, (index + 1)).replace(/{variants}/gm, vhtml);
             };
 
-            element.innerHTML = html+"</div>";
+            element.innerHTML = html + "</div>";
         }
 
         function linesSplit(lines, stages, type) {
@@ -272,6 +300,9 @@
         render();
 
 
+        window.addEventListener("keydown", (e) => {
+            if (e.code == "Digit8" && e.shiftKey) reset();
+        });
     </script>
 </body>
 
