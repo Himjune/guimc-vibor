@@ -22,12 +22,24 @@
             display: block;
         }
 
-        .stage-correct {
-            color: green;
+        #main {
+            margin: 0 auto;
+            width: fit-content;
+        }
+        .noise-block {
+            margin-top: 3rem;            
+            width: fit-content;
+        }
+        .cards-block {
+            width: fit-content;
         }
 
-        .stage-wrong {
-            color: red;
+        .stage-correct .card-header {
+            background-color: lightgreen;
+        }
+
+        .stage-wrong .card-header {
+            background-color: lightcoral;
         }
 
         .stage-wrong .btn-secondary {
@@ -41,6 +53,16 @@
         .stage-correct .btn-secondary {
             border: 3px solid green;
         }
+
+        .card {
+            margin: 0.25rem;
+            display: inline-block !important;
+        }
+
+        .btn {
+            margin: 0.1rem;
+            display: inline-block;
+        }
     </style>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
@@ -48,17 +70,21 @@
 
 <body>
     <h1>Слухоречевой тренинг</h1>
-    <div id="StagesHeader">
-    </div>
-    <h3>Термины без шума</h3>
-    <div id="StagesNoNoise">
+    <div id="main">
+        <div class="noise-block">
+            <h3>Термины без шума</h3>
+            <div id="StagesNoNoise" class="cards-block">
 
-    </div>
-    <h3>Термины в шуме</h3>
-    <div id="StagesWiNoise">
+            </div>
+        </div>
 
-    </div>
+        <div class="noise-block">
+            <h3>Термины в шуме</h3>
+            <div id="StagesWiNoise" class="cards-block">
 
+            </div>
+        </div>
+    </div>
     <button type="button" class="btn btn-primary" onclick="reset()">Сброс</button>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
@@ -118,16 +144,22 @@
         }
 
         const STAGE_TEMPLATE = `
-        <div id="sc-{stage}" class="stage-card">
-            <h5>{stage-text}</h5>
-            <div class="stage-variants">
-                {variants}
+        <div id="sc-{stage}" class="card" style="width: 18rem;">  
+            <div class="card-header">
+                <h5 class="card-title">Термин {stage-text}</h5>
             </div>
-        </div>
-    `
+            <div class="card-body">
+                <div class="stage-variants">
+                    {variants}
+                </div>
+            </div>
+        </div>`
+
         const BUTTON_TEMPLATE = `
-        <button id="btn-{variant-stage}" type="button" class="btn {variant-classes}" data-stage="{variant-stage}" data-vtext="{variant-text}" onclick="clicka(this)">{variant-text}</button>
-    `
+        <button id="btn-{variant-stage}" type="button" class="btn {variant-classes}" data-stage="{variant-stage}" data-vtext="{variant-text}" onclick="clicka(this)">
+            {variant-text}
+        </button>`
+
         function reset() {
             stagesNoNoise.forEach((stage, sIdx) => {
                 localStorage.removeItem("n" + sIdx);
@@ -186,7 +218,7 @@
 
                     vhtml += BUTTON_TEMPLATE.replace(/{variant-classes}/gm, classes).replace(/{variant-stage}/gm, stage.type + index).replace(/{variant-text}/gm, variant)
                 });
-                html += STAGE_TEMPLATE.replace(/{stage}/gm, stage.type + index).replace(/{stage-text}/gm, "Термин " + (index + 1)).replace(/{variants}/gm, vhtml);
+                html += STAGE_TEMPLATE.replace(/{stage}/gm, stage.type + index).replace(/{stage-text}/gm, (index + 1)).replace(/{variants}/gm, vhtml);
             };
 
             element.innerHTML = html;
