@@ -250,8 +250,11 @@
                 let vhtml = ""
                 stage.variants.forEach(variant => {
                     let classes = ""
-                    if (localStorage.getItem(stage.type + index) == variant) classes += "btn-secondary "
+                    if (localStorage.getItem(stage.type + index) === variant) 
+                        if (check(variant, stage)) classes += "btn-success ";
+                        else classes += "btn-danger ";
                     else classes += "btn-light "
+
                     if (localStorage.getItem(stage.type + index))
                         if (check(variant, stage)) classes += "variant-correct ";
                         else classes += "variant-wrong ";
